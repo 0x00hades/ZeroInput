@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zero Input - تجربة توعوية</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        padding: 20px;
+        position: relative;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        margin-bottom: 1.5rem;
+        font-weight: 300;
+        line-height: 1.4;
+        opacity: 0;
+        animation: fadeInUp 0.8s ease forwards;
+      }
+
+      h2 {
+        font-size: clamp(1.5rem, 4vw, 2.5rem);
+        margin-bottom: 3rem;
+        font-weight: 300;
+        opacity: 0;
+        animation: fadeInUp 0.8s ease 0.2s forwards;
+      }
+
+      .btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        color: #fff;
+        padding: 18px 50px;
+        font-size: 1.3rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        font-weight: 500;
+        opacity: 0;
+        animation: fadeInUp 0.8s ease 0.4s forwards;
+      }
+
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .landing {
+        display: block;
+      }
+
+      .reveal-section {
+        display: none;
+      }
+
+      .reveal-section.active {
+        display: block;
+      }
+
+      .info-item {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px;
+        margin: 20px 0;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.5s ease;
+      }
+
+      .info-item.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .info-label {
+        font-size: 1rem;
+        opacity: 0.8;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .info-value {
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 600;
+        margin-top: 5px;
+      }
+
+      .final-message {
+        margin-top: 60px;
+        margin-bottom: 100px;
+        opacity: 0;
+        transform: scale(0.9);
+        transition: all 0.6s ease;
+      }
+
+      .final-message.show {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .final-message h2 {
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        margin-bottom: 1rem;
+        font-weight: 400;
+        opacity: 1;
+        animation: none;
+      }
+
+      .final-message p {
+        font-size: clamp(1.3rem, 3vw, 2rem);
+        margin-bottom: 2rem;
+        font-weight: 300;
+      }
+
+      footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        text-align: center;
+        font-size: 0.85rem;
+        opacity: 0.7;
+        background: rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+      }
+
+      footer p {
+        margin: 5px 0;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      .emoji {
+        font-size: 3rem;
+        margin-bottom: 20px;
+        display: inline-block;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 600px) {
+        .btn {
+          padding: 15px 40px;
+          font-size: 1.1rem;
+        }
+
+        .info-item {
+          padding: 25px 20px;
+        }
+
+        footer {
+          font-size: 0.75rem;
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Landing Section -->
+      <div class="landing" id="landing">
+        <div class="emoji">🕵️</div>
+        <h1>أنا معرفش عنك أي حاجة</h1>
+        <h2>ولا طلبت منك تكتب أي حاجة</h2>
+        <button class="btn" onclick="startExperience()">ابدأ التجربة</button>
+      </div>
+
+      <!-- Reveal Section -->
+      <div class="reveal-section" id="revealSection">
+        <div id="infoContainer"></div>
+
+        <div class="final-message" id="finalMessage">
+          <h2>كل ده من غير ما تكتب ولا حرف</h2>
+          <p>تخيل لو كتبت</p>
+          <button class="btn" onclick="resetExperience()">
+            جرّب تجربة تانية
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>هذه تجربة ترفيهية / توعوية</p>
+      <p>لا تجمع أو تخزن أي بيانات شخصية</p>
+    </footer>
+
+    <script>
+      // Detect user information
+      function getUserInfo() {
+        const info = [];
+
+        // Device Type
+        const isMobile =
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+          );
+        info.push({
+          label: "نوع الجهاز",
+          value: isMobile ? "📱 موبايل" : "💻 كمبيوتر",
+        });
+
+        // Operating System
+        let os = "غير معروف";
+        if (navigator.userAgent.indexOf("Win") !== -1) os = "ويندوز";
+        else if (navigator.userAgent.indexOf("Mac") !== -1) os = "ماك";
+        else if (navigator.userAgent.indexOf("Linux") !== -1) os = "لينكس";
+        else if (navigator.userAgent.indexOf("Android") !== -1) os = "أندرويد";
+        else if (
+          navigator.userAgent.indexOf("iOS") !== -1 ||
+          navigator.userAgent.indexOf("iPhone") !== -1
+        )
+          os = "iOS";
+
+        info.push({
+          label: "نظام التشغيل",
+          value: os,
+        });
+
+        // Browser
+        let browser = "غير معروف";
+        const ua = navigator.userAgent;
+        if (ua.indexOf("Firefox") !== -1) browser = "🦊 فايرفوكس";
+        else if (ua.indexOf("Edg") !== -1) browser = "إيدج";
+        else if (ua.indexOf("Chrome") !== -1) browser = "🌐 كروم";
+        else if (ua.indexOf("Safari") !== -1) browser = "🧭 سفاري";
+        else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1)
+          browser = "أوبرا";
+
+        info.push({
+          label: "المتصفح",
+          value: browser,
+        });
+
+        // Language
+        const lang = navigator.language || navigator.userLanguage;
+        let displayLang = lang;
+        if (lang.startsWith("ar")) displayLang = "🇪🇬 العربية";
+        else if (lang.startsWith("en")) displayLang = "🇬🇧 الإنجليزية";
+        else if (lang.startsWith("fr")) displayLang = "🇫🇷 الفرنسية";
+        else if (lang.startsWith("es")) displayLang = "🇪🇸 الإسبانية";
+
+        info.push({
+          label: "اللغة",
+          value: displayLang,
+        });
+
+        // Local Time
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString("ar-EG", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+
+        info.push({
+          label: "الوقت المحلي",
+          value: "🕐 " + timeStr,
+        });
+
+        // Dark Mode Preference
+        if (window.matchMedia) {
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+          info.push({
+            label: "الوضع المفضل",
+            value: prefersDark ? "🌙 الوضع الليلي" : "☀️ الوضع النهاري",
+          });
+        }
+
+        // Screen Resolution
+        info.push({
+          label: "دقة الشاشة",
+          value: `📺 ${screen.width} × ${screen.height}`,
+        });
+
+        // Timezone
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        info.push({
+          label: "المنطقة الزمنية",
+          value: timezone,
+        });
+
+        return info;
+      }
+
+      function startExperience() {
+        // Hide landing
+        document.getElementById("landing").style.display = "none";
+
+        // Show reveal section
+        const revealSection = document.getElementById("revealSection");
+        revealSection.classList.add("active");
+
+        // Get user info
+        const userInfo = getUserInfo();
+        const container = document.getElementById("infoContainer");
+
+        // Clear container
+        container.innerHTML = "";
+
+        // Reveal items one by one
+        userInfo.forEach((item, index) => {
+          setTimeout(() => {
+            const infoItem = document.createElement("div");
+            infoItem.className = "info-item";
+            infoItem.innerHTML = `
+                        <div class="info-label">${item.label}</div>
+                        <div class="info-value">${item.value}</div>
+                    `;
+            container.appendChild(infoItem);
+
+            // Trigger animation
+            setTimeout(() => {
+              infoItem.classList.add("show");
+            }, 50);
+
+            // Show final message after last item
+            if (index === userInfo.length - 1) {
+              setTimeout(() => {
+                document.getElementById("finalMessage").classList.add("show");
+              }, 800);
+            }
+          }, index * 600);
+        });
+      }
+
+      function resetExperience() {
+        // Hide reveal section
+        const revealSection = document.getElementById("revealSection");
+        revealSection.classList.remove("active");
+
+        // Clear final message
+        document.getElementById("finalMessage").classList.remove("show");
+
+        // Show landing
+        setTimeout(() => {
+          document.getElementById("landing").style.display = "block";
+        }, 300);
+      }
+    </script>
+  </body>
+</html>
