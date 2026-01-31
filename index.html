@@ -221,9 +221,7 @@
         <div class="final-message" id="finalMessage">
           <h2>كل ده من غير ما تكتب ولا حرف</h2>
           <p>تخيل لو كتبت</p>
-          <button class="btn" onclick="resetExperience()">
-            جرّب  تاني  
-          </button>
+          <button class="btn" onclick="resetExperience()">جرّب تاني</button>
         </div>
       </div>
     </div>
@@ -235,45 +233,109 @@
 
     <script>
       // Detect user information
-      function getUserInfo() {
+      async function getUserInfo() {
         const info = [];
+        const ua = navigator.userAgent;
 
-        // Device Type
+        // Device Type & Brand
+        let deviceInfo = "💻 كمبيوتر";
         const isMobile =
           /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-            navigator.userAgent,
+            ua,
           );
+
+        if (isMobile) {
+          // Try to detect phone brand
+          if (/iPhone/.test(ua)) deviceInfo = "📱 iPhone";
+          else if (/iPad/.test(ua)) deviceInfo = "📱 iPad";
+          else if (/Samsung/.test(ua)) deviceInfo = "📱 Samsung";
+          else if (/Huawei/.test(ua)) deviceInfo = "📱 Huawei";
+          else if (/Xiaomi/.test(ua)) deviceInfo = "📱 Xiaomi";
+          else if (/Oppo/.test(ua)) deviceInfo = "📱 Oppo";
+          else if (/Vivo/.test(ua)) deviceInfo = "📱 Vivo";
+          else if (/OnePlus/.test(ua)) deviceInfo = "📱 OnePlus";
+          else if (/Nokia/.test(ua)) deviceInfo = "📱 Nokia";
+          else if (/Pixel/.test(ua)) deviceInfo = "📱 Google Pixel";
+          else if (/Realme/.test(ua)) deviceInfo = "📱 Realme";
+          else deviceInfo = "📱 موبايل";
+        } else {
+          // Try to detect computer type
+          if (/Macintosh/.test(ua)) deviceInfo = "💻 Mac";
+          else if (/Windows/.test(ua)) deviceInfo = "💻 Windows PC";
+          else if (/Linux/.test(ua)) deviceInfo = "💻 Linux PC";
+          else deviceInfo = "💻 كمبيوتر";
+        }
+
         info.push({
           label: "نوع الجهاز",
-          value: isMobile ? "📱 موبايل" : "💻 كمبيوتر",
+          value: deviceInfo,
         });
 
-        // Operating System
+        // Operating System with Version
         let os = "غير معروف";
-        if (navigator.userAgent.indexOf("Win") !== -1) os = "ويندوز";
-        else if (navigator.userAgent.indexOf("Mac") !== -1) os = "ماك";
-        else if (navigator.userAgent.indexOf("Linux") !== -1) os = "لينكس";
-        else if (navigator.userAgent.indexOf("Android") !== -1) os = "أندرويد";
-        else if (
-          navigator.userAgent.indexOf("iOS") !== -1 ||
-          navigator.userAgent.indexOf("iPhone") !== -1
-        )
-          os = "iOS";
+
+        // Windows
+        if (/Windows NT 10.0/.test(ua)) os = "ويندوز 10/11";
+        else if (/Windows NT 6.3/.test(ua)) os = "ويندوز 8.1";
+        else if (/Windows NT 6.2/.test(ua)) os = "ويندوز 8";
+        else if (/Windows NT 6.1/.test(ua)) os = "ويندوز 7";
+        else if (/Windows/.test(ua)) os = "ويندوز";
+        // macOS
+        else if (/Mac OS X 10[._]15/.test(ua)) os = "macOS Catalina";
+        else if (/Mac OS X 10[._]14/.test(ua)) os = "macOS Mojave";
+        else if (/Mac OS X 10[._]13/.test(ua)) os = "macOS High Sierra";
+        else if (/Mac OS X/.test(ua)) {
+          const match = ua.match(/Mac OS X (\d+)[._](\d+)/);
+          os = match ? `macOS 10.${match[2]}` : "macOS";
+        }
+
+        // Android with version
+        else if (/Android/.test(ua)) {
+          const match = ua.match(/Android\s+([\d.]+)/);
+          os = match ? `أندرويد ${match[1]}` : "أندرويد";
+        }
+
+        // iOS with version
+        else if (/iPhone|iPad|iPod/.test(ua)) {
+          const match = ua.match(/OS (\d+)[._](\d+)/);
+          os = match ? `iOS ${match[1]}.${match[2]}` : "iOS";
+        }
+
+        // Linux
+        else if (/Linux/.test(ua)) os = "لينكس";
 
         info.push({
           label: "نظام التشغيل",
           value: os,
         });
 
-        // Browser
+        // Browser Detection (More Accurate)
         let browser = "غير معروف";
-        const ua = navigator.userAgent;
-        if (ua.indexOf("Firefox") !== -1) browser = "🦊 فايرفوكس";
-        else if (ua.indexOf("Edg") !== -1) browser = "إيدج";
-        else if (ua.indexOf("Chrome") !== -1) browser = "🌐 كروم";
-        else if (ua.indexOf("Safari") !== -1) browser = "🧭 سفاري";
-        else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1)
-          browser = "أوبرا";
+
+        // Check for specific browsers first (order matters!)
+        if (/Edg\//.test(ua)) {
+          const match = ua.match(/Edg\/([\d.]+)/);
+          browser = match ? `Edge ${match[1].split(".")[0]}` : "Edge";
+        } else if (/OPR\/|Opera/.test(ua)) {
+          const match = ua.match(/(?:OPR|Opera)[\/\s]([\d.]+)/);
+          browser = match ? `Opera ${match[1].split(".")[0]}` : "Opera";
+        } else if (/Firefox\//.test(ua)) {
+          const match = ua.match(/Firefox\/([\d.]+)/);
+          browser = match
+            ? `🦊 Firefox ${match[1].split(".")[0]}`
+            : "🦊 Firefox";
+        } else if (
+          /Brave\//.test(ua) ||
+          (navigator.brave && typeof navigator.brave.isBrave === "function")
+        ) {
+          browser = "🦁 Brave";
+        } else if (/Chrome\//.test(ua) && /Safari\//.test(ua)) {
+          const match = ua.match(/Chrome\/([\d.]+)/);
+          browser = match ? `🌐 Chrome ${match[1].split(".")[0]}` : "🌐 Chrome";
+        } else if (/Safari\//.test(ua) && !/Chrome/.test(ua)) {
+          const match = ua.match(/Version\/([\d.]+)/);
+          browser = match ? `🧭 Safari ${match[1].split(".")[0]}` : "🧭 Safari";
+        }
 
         info.push({
           label: "المتصفح",
@@ -293,9 +355,9 @@
           value: displayLang,
         });
 
-        // Local Time
+        // Local Time (in English format)
         const now = new Date();
-        const timeStr = now.toLocaleTimeString("ar-EG", {
+        const timeStr = now.toLocaleTimeString("en-US", {
           hour: "2-digit",
           minute: "2-digit",
           hour12: true,
@@ -330,10 +392,73 @@
           value: timezone,
         });
 
+        // Location - Try GPS first, fallback to IP
+        let locationAdded = false;
+        
+        // Try GPS Geolocation API
+        if (navigator.geolocation) {
+          try {
+            const position = await new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                timeout: 5000,
+                maximumAge: 0
+              });
+            });
+            
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            // Reverse geocoding to get city name
+            try {
+              const geoResponse = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ar`
+              );
+              const geoData = await geoResponse.json();
+              
+              const city = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.state;
+              const country = geoData.address.country;
+              
+              if (city && country) {
+                info.push({
+                  label: "الموقع الجغرافي (GPS)",
+                  value: `📍 ${city}, ${country}`,
+                });
+                locationAdded = true;
+              }
+            } catch (e) {
+              console.log('Reverse geocoding failed');
+            }
+          } catch (error) {
+            console.log('GPS location denied or failed');
+          }
+        }
+        
+        // Fallback to IP Geolocation if GPS failed
+        if (!locationAdded) {
+          try {
+            const response = await fetch('https://ipapi.co/json/');
+            const data = await response.json();
+            
+            if (data.city && data.country_name) {
+              info.push({
+                label: "الموقع الجغرافي (IP)",
+                value: `📍 ${data.city}, ${data.country_name}`,
+              });
+            } else if (data.country_name) {
+              info.push({
+                label: "الموقع الجغرافي (IP)",
+                value: `📍 ${data.country_name}`,
+              });
+            }
+          } catch (error) {
+            console.log('IP location detection failed');
+          }
+        }
+
         return info;
       }
 
-      function startExperience() {
+      async function startExperience() {
         // Hide landing
         document.getElementById("landing").style.display = "none";
 
@@ -342,7 +467,7 @@
         revealSection.classList.add("active");
 
         // Get user info
-        const userInfo = getUserInfo();
+        const userInfo = await getUserInfo();
         const container = document.getElementById("infoContainer");
 
         // Clear container
